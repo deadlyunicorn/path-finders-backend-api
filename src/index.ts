@@ -1,5 +1,7 @@
 import express, { Request, Response } from 'express';
 import { client } from './db/connection';
+import { getUser } from './api/users/get';
+import { registerUser } from './api/users/register/register';
 
 const dotenv = require('dotenv')
 
@@ -9,18 +11,19 @@ dotenv.config({
 })
 
 const app = express();
+app.use(express.json());
+
 const port = process.env.PORT || 3000;
 
-app.get( '/', async( req: Request, res: Response ) => {
-
-  await client
-    .db('path_finders')
-    .collection('accounts')
-    .findOne({})
-    .then( res => console.log( res ));
-  res.send( "Hello world" );
-})
 
 app.listen( port, () => {
   console.log( `App is running on ${port}!`);
+});
+
+app.get( '/', async( req: Request, res: Response ) => {
+
 })
+
+app.get('/api/users/:userId', getUser );
+
+app.post('/api/users/register', registerUser );
