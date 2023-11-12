@@ -1,9 +1,23 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
+import { client } from './db/connection';
+
+const dotenv = require('dotenv')
+
+dotenv.config({
+  path: `.env.local`,
+  override: true
+})
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
-app.get( '/', ( req, res ) => {
+app.get( '/', async( req: Request, res: Response ) => {
+
+  await client
+    .db('path_finders')
+    .collection('accounts')
+    .findOne({})
+    .then( res => console.log( res ));
   res.send( "Hello world" );
 })
 
