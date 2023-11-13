@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { client } from "../../../db/connection";
 import { getHashAndPassword } from "./passGenerator";
+import { ErrorMessages } from "../../../../types";
 
 
 //POST userId. 
@@ -13,6 +14,7 @@ export const registerUser = async( req: Request, res: Response ) => {
   const body = req.body;
   const userId: string | null = body["userId"];
   const accounts = client.db('path_finders').collection('accounts');
+
 
 
   try{
@@ -62,7 +64,7 @@ export const registerUser = async( req: Request, res: Response ) => {
       
     }
     else{
-      throw "Invalid Request.";
+      throw ErrorMessages.InvalidRequest;
     }
   }
   catch( error ){
