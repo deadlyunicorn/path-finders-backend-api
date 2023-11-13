@@ -36,9 +36,12 @@ export const updateLocation = async ( req: Request, res: Response) => {
       await userLocations.updateOne(
         { userId: userId },
         { $set: {
-          location:{
-            longitude: longitude,
-            latitude: latitude
+          location: {
+            type: "Point",
+            coordinates: {
+              longitude: longitude,
+              latitude: latitude
+            }
           },
           updatedAt: currentDate
         }},
