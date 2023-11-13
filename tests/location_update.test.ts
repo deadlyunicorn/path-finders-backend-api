@@ -10,6 +10,24 @@ const updateLocation = async( testData: any ) =>
     body:JSON.stringify( testData )
   }).then( async ( res ) => res.ok? res.json() :null);
 
+
+test( "Test last updated value", async()=> { //that's how the implementation should look like
+
+  const response = await fetch( 'http://localhost:3000/api/users/100000' )
+  .then( async ( res ) => res.ok? await res.json() :null );
+
+  const updatedAt = response["data"]["updatedAt"];
+
+
+  if ( new Date( updatedAt ).getTime() - new Date().getTime() < -1800000 ){
+    expect( response ).toHaveProperty( "error.message" ); 
+    expect( response["error"]["message"] ).toBe( 'User is not sharing their location right now.' )
+  }
+  else{
+    expect( response ).toHaveProperty( "data.location.coordinates.latitude" ); 
+  }
+} )
+
 test ( 'Test Location Change', async() => {
 
   await updateLocation({
@@ -21,13 +39,16 @@ test ( 'Test Location Change', async() => {
     }
   });
 
+
   const response = await fetch( 'http://localhost:3000/api/users/100002' )
   .then( async ( res ) => res.ok? await res.json() :null );
 
-  expect( response ).toHaveProperty( "data.location.longitude" );
+  
+  expect( response ).toHaveProperty( "data.location.coordinates.longitude" );
 
 
-  expect( response["data"]["location"]["longitude"] ).toBe( 42 );
+
+  expect( response["data"]["location"]["coordinates"]["longitude"] ).toBe( 42 );
 
   await updateLocation({
     userId : 100_002,
@@ -40,7 +61,7 @@ test ( 'Test Location Change', async() => {
 
   const response2 = await fetch( 'http://localhost:3000/api/users/100002' )
   .then( async ( res ) => res.ok? await res.json() :null );
-  expect( response2["data"]["location"]["longitude"] ).toBe( 20 );
+  expect( response2["data"]["location"]["coordinates"]["longitude"] ).toBe( 20 );
 
 
 } );
