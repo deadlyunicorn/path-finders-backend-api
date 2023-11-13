@@ -6,3 +6,7 @@ export type usersResponse = {
     
   }
 }
+
+export const ErrorMessages = {
+  InvalidRequest: "Invalid Request.",
+}
