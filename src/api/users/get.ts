@@ -21,8 +21,29 @@ export const getUser = async( req: Request, res: Response ) => {
     }) as userResponse;
 
     if ( data ){
+
       const { _id, ...finalData } = data;
-      res.json( { data: finalData } );
+
+      if ( new Date( data.updatedAt ).getTime() - new Date().getTime() < -1800000 ){
+
+        await userLocations.updateOne(
+          { userId: userId },
+          { $unset: { location: "" } }
+        );
+
+        const { location, ...dataWithNoLocation } = finalData; 
+
+        return res.json( {
+          data: dataWithNoLocation,
+          error: {
+            message: "User is not sharing their location right now."
+          }
+        } );
+          
+        
+      }
+
+      return res.json( { data: finalData } );
     }
     else{
       throw 'User not found';
@@ -30,6 +51,7 @@ export const getUser = async( req: Request, res: Response ) => {
 
   }
   catch( err ){
+    console.error( err );
     res.json( {
       error:{
         message: err
@@ -45,5 +67,10 @@ type usersParams = {
 
 type userResponse = {
   _id: ObjectId,
-  userId: string
+  userId: string,
+  location:{
+    longitude: number,
+    latitude: number
+  },
+  updatedAt: number
 }
