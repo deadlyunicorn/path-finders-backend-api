@@ -11,6 +11,19 @@ const updateLocation = async( testData: any ) =>
   }).then( async ( res ) => res.ok? res.json() :null);
 
 
+  test ( 'Remove location test', async() => {
+
+    const response = await updateLocation({
+      userId : 100_002,
+      hash: user100002hash,
+      stopSharing: "true"
+    });
+    expect( response ).toHaveProperty( "data.updatedAt" );
+    expect( new Date( response["data"]["updatedAt"] ) ).toEqual( new Date( '1900' ) );
+  
+  } );
+
+
 test( "Test last updated value", async()=> { //that's how the implementation should look like
 
   const response = await fetch( 'http://localhost:3000/api/users/100000' )

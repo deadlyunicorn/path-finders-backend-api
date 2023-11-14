@@ -11,12 +11,46 @@ export const updateLocation = async ( req: Request, res: Response) => {
   const location = body["location"];
   const hash = body["hash"];
 
+  const stopSharing = body["stopSharing"];
+
   const accounts = client.db('path_finders').collection('accounts');
   const userLocations = client.db('path_finders').collection('userLocations');
 
 
   try{
-    if ( userId && hash && location && location["latitude"] && location["longitude"]  ){
+    if ( userId && stopSharing === "true" && hash ){
+
+      const user = await accounts.findOne({ userId: userId });
+      if ( !user ){ throw "No account." }
+      const pass = user["pass"];
+
+      await bcrypt.compare( hash, pass )
+        .catch( error => { throw "Invalid Request. Try erasing the app data." } );
+
+
+      const deletedDate = new Date( '1900' );
+
+      await userLocations.updateOne(
+        { userId: userId },
+        { 
+          $unset: {
+          location: ""
+          },
+          $set:{
+            updatedAt: deletedDate
+          }
+        }
+      )
+
+      return res.json({
+        data: {
+          updatedAt: deletedDate
+        }
+      });
+
+
+    }
+    else if ( userId && hash && location && location["latitude"] && location["longitude"]  ){
 
       const latitude = Number.parseFloat( location.latitude );
       const longitude = Number.parseFloat( location.longitude );
@@ -70,14 +104,14 @@ export const updateLocation = async ( req: Request, res: Response) => {
     });
   }
   
-
 }
 
 type updateBody = {
   userId : string,
   hash   : string,
   location: {
-    longitude: string
-    latitude: string,
-  }
+    longitude: string,
+    latitude: string
+  },
+  stopSharing: string
 }
