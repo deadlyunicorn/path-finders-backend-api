@@ -3,6 +3,7 @@ import { client } from './db/connection';
 import { getUser } from './api/users/get';
 import { registerUser } from './api/users/register/register';
 import { updateLocation } from './api/users/updateLocation/updateLocation';
+import { generateId } from './api/users/generateId';
 
 const dotenv = require('dotenv')
 
@@ -26,6 +27,7 @@ app.get( '/', async( req: Request, res: Response ) => {
 
 })
 
+app.get('/api/users/generateId', generateId );
 app.get('/api/users/:userId', getUser );
 
 app.post('/api/users/register', registerUser );
